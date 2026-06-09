@@ -1,6 +1,9 @@
-﻿namespace ShopFlow.Api.Application.DTOs.Products;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class CreateProductsRequest
-{
-    
-}
+namespace ShopFlow.Api.Application.DTOs.Products;
+
+public sealed record CreateProductRequest(
+    [Required] string Name,
+    [Required] string Category,
+    decimal Price,
+    int Stock);

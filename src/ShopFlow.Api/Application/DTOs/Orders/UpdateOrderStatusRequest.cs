@@ -2,4 +2,4 @@
 
 namespace ShopFlow.Api.Application.DTOs.Orders;
 
-public sealed record UpdateOrderStatus(OrderStatus OrderStatus, Guid CustomerId);
+public sealed record UpdateOrderStatusRequest(OrderStatus OrderStatus);

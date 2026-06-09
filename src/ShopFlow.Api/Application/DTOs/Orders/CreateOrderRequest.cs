@@ -1,6 +1,7 @@
-﻿namespace ShopFlow.Api.Application.DTOs.Orders;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class CreateOrderRequest
-{
-    
-}
+namespace ShopFlow.Api.Application.DTOs.Orders;
+
+public sealed record CreateOrderRequest(
+    [Required] string CustomerName,
+    [Required] IReadOnlyList<CreateOrderItemRequest> Items);

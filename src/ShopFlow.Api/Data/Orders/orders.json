@@ -1,0 +1,78 @@
+[
+  {
+    "Id": "a1111111-1111-1111-1111-111111111111",
+    "CustomerName": "\u0418\u0432\u0430\u043D \u0418\u0432\u0430\u043D\u043E\u0432",
+    "Items": [
+      {
+        "ProductId": "11111111-1111-1111-1111-111111111111",
+        "ProductName": "iPhone 15",
+        "Quantity": 1,
+        "UnitPrice": 89990.00
+      }
+    ],
+    "Status": 0,
+    "CreatedAt": "2026-06-09T10:00:00+00:00"
+  },
+  {
+    "Id": "a2222222-2222-2222-2222-222222222222",
+    "CustomerName": "\u041F\u0435\u0442\u0440 \u041F\u0435\u0442\u0440\u043E\u0432",
+    "Items": [
+      {
+        "ProductId": "22222222-2222-2222-2222-222222222222",
+        "ProductName": "Samsung Galaxy S25",
+        "Quantity": 2,
+        "UnitPrice": 79990.00
+      }
+    ],
+    "Status": 2,
+    "CreatedAt": "2026-06-08T15:30:00+00:00"
+  },
+  {
+    "Id": "a3333333-3333-3333-3333-333333333333",
+    "CustomerName": "\u0410\u043D\u043D\u0430 \u0421\u043C\u0438\u0440\u043D\u043E\u0432\u0430",
+    "Items": [
+      {
+        "ProductId": "33333333-3333-3333-3333-333333333333",
+        "ProductName": "MacBook Air M4",
+        "Quantity": 1,
+        "UnitPrice": 129990.00
+      },
+      {
+        "ProductId": "55555555-5555-5555-5555-555555555555",
+        "ProductName": "Sony WH-1000XM5",
+        "Quantity": 1,
+        "UnitPrice": 32990.00
+      }
+    ],
+    "Status": 2,
+    "CreatedAt": "2026-06-07T09:15:00+00:00"
+  },
+  {
+    "Id": "f0f82630-6168-486b-a0e6-386032203ade",
+    "CustomerName": "string",
+    "Items": [
+      {
+        "ProductId": "22222222-2222-2222-2222-222222222222",
+        "ProductName": "Samsung Galaxy S25",
+        "Quantity": 3,
+        "UnitPrice": 79990.00
+      }
+    ],
+    "Status": 3,
+    "CreatedAt": "2026-06-09T11:52:36.2285224+00:00"
+  },
+  {
+    "Id": "a4444444-4444-4444-4444-444444444444",
+    "CustomerName": "\u0421\u0435\u0440\u0433\u0435\u0439 \u041A\u0443\u0437\u043D\u0435\u0446\u043E\u0432",
+    "Items": [
+      {
+        "ProductId": "9b3f9c6e-a6c5-4908-944b-2ba9b0e1fa3d",
+        "ProductName": "string",
+        "Quantity": 1,
+        "UnitPrice": 0
+      }
+    ],
+    "Status": 0,
+    "CreatedAt": "2026-06-06T18:45:00+00:00"
+  }
+]

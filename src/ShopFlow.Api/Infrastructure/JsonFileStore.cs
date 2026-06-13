@@ -2,7 +2,7 @@
 
 namespace ShopFlow.Api.Infrastructure;
 
-public class JsonFileStore
+public class JsonFileStore: IJsonFileStore
 {
     public async Task<List<T>> ReadAsync<T>(string path)
     {

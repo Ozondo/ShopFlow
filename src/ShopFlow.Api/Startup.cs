@@ -1,4 +1,6 @@
 using ShopFlow.Api.Application.Interfaces;
+using ShopFlow.Api.Application.Services;
+using ShopFlow.Api.Domain.Orders.Models;
 using ShopFlow.Api.Infrastructure;
 using ShopFlow.Api.Infrastructure.Repositories;
 
@@ -19,17 +21,21 @@ public class Startup(IConfiguration configuration)
         services.AddSwaggerGen();
 
         // TODO: зарегистрируй Infrastructure-сервисы (JsonFileStore, репозитории)
-        services.AddSingleton<JsonFileStore>();
+        services.AddSingleton<IJsonFileStore, JsonFileStore>();
         
         services.AddScoped<IProductRepository>(sp => 
             new ProductRepository(
-                sp.GetRequiredService<JsonFileStore>(),
+                sp.GetRequiredService<IJsonFileStore>(),
                 "Data/Products/products.json"));
 
         services.AddScoped<IOrdersRepository>(sp =>
             new OrderRepository(
-                sp.GetRequiredService<JsonFileStore>(),
+                sp.GetRequiredService<IJsonFileStore>(),
                 "Data/Orders/orders.json"));
+
+        services.AddScoped<IProductSevice, ProductService>();
+        
+        services.AddScoped<IOrderService, OrderService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

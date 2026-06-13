@@ -25,4 +25,8 @@
     <_ContentIncludedByDefault Remove="Data\products.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Application\DTOs\" />
+  </ItemGroup>
+
 </Project>

@@ -1,55 +1,75 @@
 ﻿using ShopFlow.Api.Application.Interfaces;
 using ShopFlow.Api.Domain.Orders.Models;
-using ShopFlow.Api.Domain.Products.Models;
 
 namespace ShopFlow.Api.Infrastructure.Repositories;
 
-public class OrderRepository(JsonFileStore jsonFileStore, string ordersPath): IOrdersRepository
+public class OrderRepository(IJsonFileStore jsonFileStore, string ordersPath): IOrdersRepository
 {
-    private readonly JsonFileStore  _jsonFileStore = jsonFileStore;
-    private readonly string _ordersPath = ordersPath;
+    private static readonly SemaphoreSlim _lock = new(1, 1);
     
-    public async Task<List<Order>> GetAll()
+    public async Task<List<Order>?> GetAll()
     {
-        var result = await _jsonFileStore.ReadAsync<Order>(_ordersPath);
+        var result = await jsonFileStore.ReadAsync<Order>(ordersPath);
         
         return result;
     }
 
     public async Task<Order?> GetById(Guid id)
     {
-        var orders = await _jsonFileStore.ReadAsync<Order>(_ordersPath);
+        var orders = await jsonFileStore.ReadAsync<Order>(ordersPath);
         
         return orders.FirstOrDefault(x => x.Id == id);
     }
 
     public async Task<Order> Create(Order order)
     {
-        var orders = await _jsonFileStore.ReadAsync<Order>(_ordersPath);
+        await _lock.WaitAsync();
+
+        try
+        {
+            var orders = await jsonFileStore.ReadAsync<Order>(ordersPath);
         
-        orders.Add(order);
+            orders.Add(order);
         
-        await _jsonFileStore.WriteAsync(_ordersPath, orders);
+            await jsonFileStore.WriteAsync(ordersPath, orders);
         
-        return order;
+            return order;
+        }
+        
+        finally
+        {
+            _lock.Release();
+        }
+
     }
     
     public async Task<Order?> Update(Guid id, OrderStatus orderStatus)
     {
-        var orders = await _jsonFileStore.ReadAsync<Order>(_ordersPath);
+        await _lock.WaitAsync();
+
+        try
+        {
+
+            var orders = await jsonFileStore.ReadAsync<Order>(ordersPath);
+
+            var order = orders.FirstOrDefault(x => x.Id == id);
+
+            if (order == null) return null;
+
+            var orderIndex = orders.IndexOf(order);
+
+            var updateOrder = order with { Status = orderStatus };
+
+            orders[orderIndex] = updateOrder;
+
+            await jsonFileStore.WriteAsync(ordersPath, orders);
+
+            return updateOrder;
+        }
         
-        var order = orders.FirstOrDefault(x => x.Id == id);
-        
-        if (order == null) return null;
-        
-        var orderIndex = orders.IndexOf(order);
-        
-        var updateOrder = order with { Status = orderStatus };
-        
-        orders[orderIndex] = updateOrder;
-        
-        await _jsonFileStore.WriteAsync(_ordersPath, orders);
-        
-        return updateOrder;
+        finally
+        {
+            _lock.Release();
+        }
     }
 }

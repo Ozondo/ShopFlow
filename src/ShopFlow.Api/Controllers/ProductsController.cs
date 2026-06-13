@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ShopFlow.Api.Application.DTOs.Products;
 using ShopFlow.Api.Application.Interfaces;
-using ShopFlow.Api.Domain.Products.Models;
 
 namespace ShopFlow.Api.Controllers;
 
@@ -14,88 +13,53 @@ namespace ShopFlow.Api.Controllers;
 [Produces("application/json")]
 public class ProductsController : ControllerBase
 {
-    // TODO: внедри IProductRepository через конструктор
-    private readonly IProductRepository _productRepository;
+    private readonly IProductSevice _productSevice;
 
-    public ProductsController(IProductRepository productRepository)
+    public ProductsController(IProductSevice productSevice)
     {
-        _productRepository = productRepository;
+        _productSevice = productSevice;
     }
-    // TODO: добавь action-методы
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var products = await _productRepository.GetAll();
-        return Ok(products);
+        var result = await _productSevice.GetAll();
+        
+        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
     }
     
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var product = await _productRepository.GetById(id);
+        var result = await _productSevice.GetById(id);
         
-        if (product == null)  return NotFound($"Product by id = {id} not found");
-        
-        return Ok(product);
+        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
     }
     
     [HttpPost]
     [Route("Create")]
     public async Task<IActionResult> Create(CreateProductRequest request)
     {
-        if (request.Stock < 1) return BadRequest($"Stock must be greater than or equal to 1.");
-        if (request.Price <= 0) return BadRequest($"Price must be greater than 0.");
-        if (string.IsNullOrEmpty(request.Name)) return BadRequest($"Product name is required.");
-        if (string.IsNullOrEmpty(request.Category)) return BadRequest($"Product category is required.");
-        
-        var product = new Product(
-            Guid.NewGuid(),
-            request.Name,
-            request.Category,
-            request.Price,
-            request.Stock
-            );
-        
-        var result = await _productRepository.Create(product);
-        
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = result.Id },
-            result);
+        var result = await _productSevice.Create(request);
+
+        return result.Success ? 
+            CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result.Data) 
+            : BadRequest(result.Error);
     }
     
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, UpdateProductRequest request)
     {
-        if (request.Stock < 1) return BadRequest($"Stock must be greater than or equal to 1.");
-        if (request.Price <= 0) return BadRequest($"Price must be greater than 0.");
-        if (string.IsNullOrEmpty(request.Name)) return BadRequest($"Product name is required.");
-        if (string.IsNullOrEmpty(request.Category)) return BadRequest($"Product category is required.");
+        var result = await _productSevice.Update(id, request);
         
-        
-        var product = new Product(
-            id,
-            request.Name,
-            request.Category,
-            request.Price,
-            request.Stock
-        );
-        
-        var result = await _productRepository.Update(id, product);
-        
-        if(result == null) return NotFound($"Product with id = {id} not found");
-        
-        return Ok(result);
+        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
     }
     
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var result = await _productRepository.Delete(id);
+        var result = await _productSevice.Delete(id);
         
-        if(result == null) return NotFound($"Product with id = {id} not found");
-        
-        return Ok(result);
+        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
     }
 }

@@ -11,6 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <ProjectReference Include="..\..\src\ShopFlow.Api\ShopFlow.Api.csproj" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.17" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
@@ -20,11 +22,6 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\ShopFlow.Api\ShopFlow.Api.csproj" />
-    <ProjectReference Include="..\..\src\ShopFlow.Api\ShopFlow.Api.csproj" />
   </ItemGroup>
 
 </Project>

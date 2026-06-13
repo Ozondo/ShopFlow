@@ -3,6 +3,7 @@
     <Project Path="src/ShopFlow.Api/ShopFlow.Api.csproj" />
   </Folder>
   <Folder Name="/test/">
-    <Project Path="src/ShopFlow.Api.Tests/ShopFlow.Api.Tests.csproj" />
+    <Project Path="tests/ShopFlow.Api.Ingtegration/ShopFlow.Api.IntegrationTests.csproj" />
+    <Project Path="tests/ShopFlow.Api.UnitTests/ShopFlow.Api.UnitTests.csproj" />
   </Folder>
 </Solution>

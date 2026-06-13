@@ -3,14 +3,13 @@ using ShopFlow.Api.Domain.Products.Models;
 
 namespace ShopFlow.Api.Infrastructure.Repositories;
 
-public class ProductRepository(JsonFileStore jsonFileStore, string productPath): IProductRepository
+public class ProductRepository(IJsonFileStore jsonFileStore, string productPath): IProductRepository
 {
-    private readonly JsonFileStore  _jsonFileStore = jsonFileStore;
-    private readonly string _productsPath = productPath;
+    private static readonly SemaphoreSlim _lock = new(1, 1);
     
-    public async Task<List<Product>> GetAll()
+    public async Task<List<Product>?> GetAll()
     {
-        var products = await _jsonFileStore.ReadAsync<Product>(_productsPath);
+        var products = await jsonFileStore.ReadAsync<Product>(productPath);
         
         return products;
     }
@@ -19,49 +18,83 @@ public class ProductRepository(JsonFileStore jsonFileStore, string productPath):
     {
         var products = await GetAll();
         
+        if (products == null) return null;
+        
         return products.FirstOrDefault(x => x.Id == id);
     }
     
     public async Task<Product> Create(Product product)
     {
-        var products = await GetAll();
+        await _lock.WaitAsync();
+
+        try
+        {
+
+            var products = await GetAll();
+
+            products.Add(product);
+
+            await jsonFileStore.WriteAsync(productPath, products);
+
+            return product;
+        }
         
-        products.Add(product);
-        
-        await _jsonFileStore.WriteAsync(_productsPath, products);
-        
-        return product;
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     public async Task<Product?> Update(Guid id, Product product)
     {
-        var products = await GetAll();
-        
-        var existingProduct = products.FirstOrDefault(x => x.Id == id);
+        await _lock.WaitAsync();
 
-        if (existingProduct == null) return null;
+        try
+        {
 
-        var indexOfExistingProduct = products.IndexOf(existingProduct);
+            var products = await GetAll();
+
+            var existingProduct = products.FirstOrDefault(x => x.Id == id);
+
+            if (existingProduct == null) return null;
+
+            var indexOfExistingProduct = products.IndexOf(existingProduct);
+
+            products[indexOfExistingProduct] = product;
+
+            await jsonFileStore.WriteAsync(productPath, products);
+
+            return product;
+        }
         
-        products[indexOfExistingProduct] = product;
-        
-        await _jsonFileStore.WriteAsync(_productsPath, products);
-        
-        return product;
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     public async Task<Product?> Delete(Guid id)
     {
-        var products = await GetAll();
-        
-        var deleteProduct = products.FirstOrDefault(x => x.Id == id);
+        await _lock.WaitAsync();
 
-        if (deleteProduct == null) return null;
+        try
+        {
+            var products = await GetAll();
 
-        products.Remove(deleteProduct);
+            var deleteProduct = products.FirstOrDefault(x => x.Id == id);
+
+            if (deleteProduct == null) return null;
+
+            products.Remove(deleteProduct);
+
+            await jsonFileStore.WriteAsync(productPath, products);
+
+            return deleteProduct;
+        }
         
-        await _jsonFileStore.WriteAsync(_productsPath, products);
-        
-        return deleteProduct;
+        finally
+        {
+            _lock.Release();
+        }
     }
 }

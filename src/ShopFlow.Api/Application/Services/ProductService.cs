@@ -1,6 +1,86 @@
-﻿namespace ShopFlow.Api.Application.Services;
+﻿using ShopFlow.Api.Application.Common;
+using ShopFlow.Api.Application.DTOs.Products;
+using ShopFlow.Api.Application.Interfaces;
+using ShopFlow.Api.Domain.Products.Models;
 
-public class ProductService
+namespace ShopFlow.Api.Application.Services;
+
+public class ProductService: IProductSevice
 {
+    private readonly IProductRepository _productRepository;
     
+    public ProductService(IProductRepository productRepository)
+    {
+        _productRepository = productRepository;
+    }
+    
+    public async Task<Result<IReadOnlyList<Product>>> GetAll()
+    {
+        var products = await _productRepository.GetAll();
+
+        if (products is null) return Result<IReadOnlyList<Product>>.Fail($"Products not found");
+        
+        return Result<IReadOnlyList<Product>>.Ok(products);
+    }
+
+    public async Task<Result<Product>> GetById(Guid id)
+    {
+        var product = await _productRepository.GetById(id);
+        
+        if (product is null) return Result<Product>.Fail($"Product not found");
+        
+        return Result<Product>.Ok(product);
+    }
+
+    public async Task<Result<Product>> Create(CreateProductRequest request)
+    {
+        if (request.Stock < 1) return Result<Product>.Fail($"Stock must be greater than or equal to 1.");
+        if (request.Price <= 0) return  Result<Product>.Fail($"Price must be greater than 0.");
+        if (string.IsNullOrEmpty(request.Name)) return  Result<Product>.Fail($"Product name is required.");
+        if (string.IsNullOrEmpty(request.Category)) return  Result<Product>.Fail($"Product category is required.");
+        
+        var product = new Product(
+            Guid.NewGuid(),
+            request.Name,
+            request.Category,
+            request.Price,
+            request.Stock
+        );
+        
+        var result = await _productRepository.Create(product);
+        
+        return Result<Product>.Ok(product);
+    }
+    
+
+    public async Task<Result<Product>> Update(Guid id, UpdateProductRequest request)
+    {
+        if (request.Stock < 1) return Result<Product>.Fail($"Stock must be greater than or equal to 1.");
+        if (request.Price <= 0) return Result<Product>.Fail($"Price must be greater than 0.");
+        if (string.IsNullOrEmpty(request.Name)) return Result<Product>.Fail($"Product name is required.");
+        if (string.IsNullOrEmpty(request.Category)) return Result<Product>.Fail($"Product category is required.");
+        
+        var product = new Product(
+            id,
+            request.Name,
+            request.Category,
+            request.Price,
+            request.Stock
+        );
+        
+        var result = await _productRepository.Update(id, product);
+        
+        if (result == null) return Result<Product>.Fail($"Product with id = {id} not found");
+        
+        return Result<Product>.Ok(product);
+    }
+
+    public async Task<Result<Product>> Delete(Guid id)
+    {
+        var result = await _productRepository.Delete(id);
+        
+        if (result == null) return Result<Product>.Fail($"Product with id = {id} not found");
+        
+        return Result<Product>.Ok(result);
+    }
 }

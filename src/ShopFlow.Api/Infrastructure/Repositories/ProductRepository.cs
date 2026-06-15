@@ -1,14 +1,13 @@
-﻿using ShopFlow.Api.Application.Interfaces;
-using ShopFlow.Api.Domain.Products.Models;
+﻿using ShopFlow.Api.Domain.Products.Models;
 using ShopFlow.Api.Infrastructure.Interfaces;
 
 namespace ShopFlow.Api.Infrastructure.Repositories;
 
-public class ProductRepository(IJsonFileStore jsonFileStore, string productPath): IProductRepository
+public class ProductUnit(IJsonFileStore jsonFileStore, string productPath): IProductRepository
 {
     private static readonly SemaphoreSlim Lock = new(1, 1);
     
-    public async Task<List<Product>?> GetAll()
+    public async Task<List<Product>> GetAll()
     {
         var products = await jsonFileStore.ReadAsync<Product>(productPath);
         
@@ -52,7 +51,7 @@ public class ProductRepository(IJsonFileStore jsonFileStore, string productPath)
         }
     }
 
-    public async Task<Product?> Update(Guid id, Product product)
+    public async Task<Product> Update(Product product)
     {
         await Lock.WaitAsync();
 
@@ -61,13 +60,9 @@ public class ProductRepository(IJsonFileStore jsonFileStore, string productPath)
 
             var products = await GetAll();
 
-            var existingProduct = products.FirstOrDefault(x => x.Id == id);
+            var indexOfProduct = products.FindIndex(x => x.Id == product.Id);
 
-            if (existingProduct == null) return null;
-
-            var indexOfExistingProduct = products.IndexOf(existingProduct);
-
-            products[indexOfExistingProduct] = product;
+            products[indexOfProduct] = product;
 
             await jsonFileStore.WriteAsync(productPath, products);
 
@@ -80,7 +75,7 @@ public class ProductRepository(IJsonFileStore jsonFileStore, string productPath)
         }
     }
 
-    public async Task<Product?> Delete(Guid id)
+    public async Task<Product> Delete(Guid id)
     {
         await Lock.WaitAsync();
 
@@ -88,15 +83,15 @@ public class ProductRepository(IJsonFileStore jsonFileStore, string productPath)
         {
             var products = await GetAll();
 
-            var deleteProduct = products.FirstOrDefault(x => x.Id == id);
+            var deleteIndexOfProduct = products.FindIndex(x => x.Id == id);
+            
+            var product = products[deleteIndexOfProduct];
 
-            if (deleteProduct == null) return null;
-
-            products.Remove(deleteProduct);
+            products.Remove(product);
 
             await jsonFileStore.WriteAsync(productPath, products);
 
-            return deleteProduct;
+            return product;
         }
         
         finally

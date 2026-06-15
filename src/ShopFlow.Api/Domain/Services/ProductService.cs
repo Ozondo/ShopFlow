@@ -15,11 +15,9 @@ public class ProductService: IProductSevice
         _productRepository = productRepository;
     }
     
-    public async Task<Result<IReadOnlyList<Product>>?> GetAll()
+    public async Task<Result<IReadOnlyList<Product>>> GetAll()
     {
         var products = await _productRepository.GetAll();
-
-        if (products is null) return Result<IReadOnlyList<Product>>.Fail($"Products not found");
         
         return Result<IReadOnlyList<Product>>.Ok(products);
     }
@@ -56,6 +54,11 @@ public class ProductService: IProductSevice
 
     public async Task<Result<Product>> Update(Guid id, UpdateProductRequest request)
     {
+        var existingProduct = await _productRepository.GetById(id);
+
+        if (existingProduct == null)
+            return Result<Product>.Fail($"Product with id {id} not found");
+        
         if (request.Stock < 1) return Result<Product>.Fail($"Stock must be greater than or equal to 1.");
         if (request.Price <= 0) return Result<Product>.Fail($"Price must be greater than 0.");
         if (string.IsNullOrEmpty(request.Name)) return Result<Product>.Fail($"Product name is required.");
@@ -69,18 +72,19 @@ public class ProductService: IProductSevice
             request.Stock
         );
         
-        var result = await _productRepository.Update(id, product);
-        
-        if (result == null) return Result<Product>.Fail($"Product with id = {id} not found");
+        var result = await _productRepository.Update(product);
         
         return Result<Product>.Ok(product);
     }
 
     public async Task<Result<Product>> Delete(Guid id)
     {
-        var result = await _productRepository.Delete(id);
+        var existingProduct = await _productRepository.GetById(id);
+
+        if (existingProduct == null)
+            return Result<Product>.Fail($"Product with id {id} not found");
         
-        if (result == null) return Result<Product>.Fail($"Product with id = {id} not found");
+        var result = await _productRepository.Delete(id);
         
         return Result<Product>.Ok(result);
     }

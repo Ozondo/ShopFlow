@@ -21,8 +21,6 @@ public class OrderService: IOrderService
     {
         var orders = await _ordersRepository.GetAll();
         
-        if (orders == null) return Result<IReadOnlyList<Order>>.Fail("Orders not found");
-        
         return Result<IReadOnlyList<Order>>.Ok(orders);
     }
 
@@ -85,25 +83,29 @@ public class OrderService: IOrderService
         
         if (order == null) return Result<Order>.Fail($"Order with id {id} not found");
         
-        if (order.Status == request.OrderStatus)
-            return Result<Order>.Fail($"Order already has status {request.OrderStatus}");
+        switch (order.Status)
+        {
+            case OrderStatus.Shipped:
+                return Result<Order>.Fail($"Order with id {id} is shipped");
+
+            case OrderStatus.Cancelled:
+                return Result<Order>.Fail($"Order with id {id} is cancelled");
+
+            case OrderStatus.New when request.OrderStatus == OrderStatus.Shipped:
+                return Result<Order>.Fail(
+                    $"Order with id {id} can have status Processing or Cancelled");
+
+            case OrderStatus.Processing when request.OrderStatus == OrderStatus.New:
+                return Result<Order>.Fail(
+                    $"Order with id {id} can`t have status New");
+        }
         
-        if (order.Status == OrderStatus.Shipped) 
-            return Result<Order>.Fail($"Order with id {id} is shipped");
+        var updatedOrder = order with
+        {
+            Status = request.OrderStatus
+        };
         
-        if (order.Status == OrderStatus.Cancelled)
-            return Result<Order>.Fail($"Order with id {id} is cancelled");
-        
-        if (order.Status == OrderStatus.New && request.OrderStatus == OrderStatus.Shipped)
-            return Result<Order>.Fail($"Order with id {id} can have status Processing or Cancelled");
-        
-        if (order.Status == OrderStatus.Processing && request.OrderStatus == OrderStatus.New)
-            return Result<Order>.Fail($"Order with id {id} can`t have status New");
-        
-        var result = await _ordersRepository.Update(id, request.OrderStatus);
-        
-        if (result == null)
-            return Result<Order>.Fail($"Order with id {id} not found");
+        var result = await _ordersRepository.Update(updatedOrder);
         
         return Result<Order>.Ok(result);
     }

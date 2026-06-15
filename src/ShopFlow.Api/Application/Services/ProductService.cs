@@ -2,6 +2,7 @@
 using ShopFlow.Api.Application.DTOs.Products;
 using ShopFlow.Api.Application.Interfaces;
 using ShopFlow.Api.Domain.Products.Models;
+using ShopFlow.Api.Infrastructure.Interfaces;
 
 namespace ShopFlow.Api.Application.Services;
 
@@ -14,7 +15,7 @@ public class ProductService: IProductSevice
         _productRepository = productRepository;
     }
     
-    public async Task<Result<IReadOnlyList<Product>>> GetAll()
+    public async Task<Result<IReadOnlyList<Product>>?> GetAll()
     {
         var products = await _productRepository.GetAll();
 
@@ -49,7 +50,7 @@ public class ProductService: IProductSevice
         
         var result = await _productRepository.Create(product);
         
-        return Result<Product>.Ok(product);
+        return Result<Product>.Ok(result);
     }
     
 

@@ -2,6 +2,7 @@ using ShopFlow.Api.Application.Interfaces;
 using ShopFlow.Api.Application.Services;
 using ShopFlow.Api.Domain.Orders.Models;
 using ShopFlow.Api.Infrastructure;
+using ShopFlow.Api.Infrastructure.Interfaces;
 using ShopFlow.Api.Infrastructure.Repositories;
 
 namespace ShopFlow.Api;
@@ -16,11 +17,8 @@ public class Startup(IConfiguration configuration)
 
         services.AddEndpointsApiExplorer();
         
-
-        // TODO: подключи сваггер
         services.AddSwaggerGen();
-
-        // TODO: зарегистрируй Infrastructure-сервисы (JsonFileStore, репозитории)
+        
         services.AddSingleton<IJsonFileStore, JsonFileStore>();
         
         services.AddScoped<IProductRepository>(sp => 

@@ -1,11 +1,12 @@
 ﻿using ShopFlow.Api.Application.Interfaces;
 using ShopFlow.Api.Domain.Products.Models;
+using ShopFlow.Api.Infrastructure.Interfaces;
 
 namespace ShopFlow.Api.Infrastructure.Repositories;
 
 public class ProductRepository(IJsonFileStore jsonFileStore, string productPath): IProductRepository
 {
-    private static readonly SemaphoreSlim _lock = new(1, 1);
+    private static readonly SemaphoreSlim Lock = new(1, 1);
     
     public async Task<List<Product>?> GetAll()
     {
@@ -18,14 +19,20 @@ public class ProductRepository(IJsonFileStore jsonFileStore, string productPath)
     {
         var products = await GetAll();
         
-        if (products == null) return null;
-        
         return products.FirstOrDefault(x => x.Id == id);
+    }
+    
+    public async Task<List<Product>> GetByIds(IEnumerable<Guid> ids)
+    {
+        var products = await GetAll();
+        var idsList = ids.ToHashSet();
+        
+        return products.Where(x => idsList.Contains(x.Id)).ToList();
     }
     
     public async Task<Product> Create(Product product)
     {
-        await _lock.WaitAsync();
+        await Lock.WaitAsync();
 
         try
         {
@@ -41,13 +48,13 @@ public class ProductRepository(IJsonFileStore jsonFileStore, string productPath)
         
         finally
         {
-            _lock.Release();
+            Lock.Release();
         }
     }
 
     public async Task<Product?> Update(Guid id, Product product)
     {
-        await _lock.WaitAsync();
+        await Lock.WaitAsync();
 
         try
         {
@@ -69,13 +76,13 @@ public class ProductRepository(IJsonFileStore jsonFileStore, string productPath)
         
         finally
         {
-            _lock.Release();
+            Lock.Release();
         }
     }
 
     public async Task<Product?> Delete(Guid id)
     {
-        await _lock.WaitAsync();
+        await Lock.WaitAsync();
 
         try
         {
@@ -94,7 +101,7 @@ public class ProductRepository(IJsonFileStore jsonFileStore, string productPath)
         
         finally
         {
-            _lock.Release();
+            Lock.Release();
         }
     }
 }

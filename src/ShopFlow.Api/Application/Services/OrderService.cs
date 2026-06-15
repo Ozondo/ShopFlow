@@ -2,6 +2,7 @@
 using ShopFlow.Api.Application.DTOs.Orders;
 using ShopFlow.Api.Application.Interfaces;
 using ShopFlow.Api.Domain.Orders.Models;
+using ShopFlow.Api.Infrastructure.Interfaces;
 
 namespace ShopFlow.Api.Application.Services;
 
@@ -38,13 +39,23 @@ public class OrderService: IOrderService
     {
         
         var orderItems = new List<OrderItem>();
+        
+        var productsIds = request.Items
+            .Select(x => x.ProductId)
+            .Distinct()
+            .ToList();
+        
+        var products = await _productRepository.GetByIds(productsIds);
+        
+        var dictionaryProducts = products.ToDictionary(x => x.Id);
 
         foreach (var item in request.Items)
         {
-            var product = await _productRepository.GetById(item.ProductId);
+            if (!dictionaryProducts.TryGetValue(item.ProductId, out var product))
+                return Result<Order>.Fail($"Product with id {item.ProductId} not found");
             
-            if (product == null) return Result<Order>.Fail($"Product with id {item.ProductId} not found");
             if (product.Stock == 0) return Result<Order>.Fail($"Product with id {item.ProductId} stock is 0");
+            
             if (product.Stock < item.Quantity) return Result<Order>.Fail($"Product with id {item.ProductId} not enough stock");
             
             orderItems.Add(new OrderItem(

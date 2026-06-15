@@ -5,7 +5,7 @@ namespace ShopFlow.Api.Infrastructure.Repositories;
 
 public class OrderRepository(IJsonFileStore jsonFileStore, string ordersPath): IOrdersRepository
 {
-    private static readonly SemaphoreSlim _lock = new(1, 1);
+    private static readonly SemaphoreSlim Lock = new(1, 1);
     
     public async Task<List<Order>?> GetAll()
     {
@@ -23,7 +23,7 @@ public class OrderRepository(IJsonFileStore jsonFileStore, string ordersPath): I
 
     public async Task<Order> Create(Order order)
     {
-        await _lock.WaitAsync();
+        await Lock.WaitAsync();
 
         try
         {
@@ -38,14 +38,14 @@ public class OrderRepository(IJsonFileStore jsonFileStore, string ordersPath): I
         
         finally
         {
-            _lock.Release();
+            Lock.Release();
         }
 
     }
     
     public async Task<Order?> Update(Guid id, OrderStatus orderStatus)
     {
-        await _lock.WaitAsync();
+        await Lock.WaitAsync();
 
         try
         {
@@ -53,7 +53,7 @@ public class OrderRepository(IJsonFileStore jsonFileStore, string ordersPath): I
             var orders = await jsonFileStore.ReadAsync<Order>(ordersPath);
 
             var order = orders.FirstOrDefault(x => x.Id == id);
-
+            
             if (order == null) return null;
 
             var orderIndex = orders.IndexOf(order);
@@ -69,7 +69,7 @@ public class OrderRepository(IJsonFileStore jsonFileStore, string ordersPath): I
         
         finally
         {
-            _lock.Release();
+            Lock.Release();
         }
     }
 }

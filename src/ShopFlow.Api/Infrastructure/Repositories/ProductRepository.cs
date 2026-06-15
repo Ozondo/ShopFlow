@@ -3,7 +3,7 @@ using ShopFlow.Api.Infrastructure.Interfaces;
 
 namespace ShopFlow.Api.Infrastructure.Repositories;
 
-public class ProductUnit(IJsonFileStore jsonFileStore, string productPath): IProductRepository
+public class ProductRepository(IJsonFileStore jsonFileStore, string productPath): IProductRepository
 {
     private static readonly SemaphoreSlim Lock = new(1, 1);
     

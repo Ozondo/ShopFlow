@@ -1,6 +1,6 @@
 using ShopFlow.Api.Application.Interfaces;
-using ShopFlow.Api.Application.Services;
 using ShopFlow.Api.Domain.Orders.Models;
+using ShopFlow.Api.Domain.Services;
 using ShopFlow.Api.Infrastructure;
 using ShopFlow.Api.Infrastructure.Interfaces;
 using ShopFlow.Api.Infrastructure.Repositories;

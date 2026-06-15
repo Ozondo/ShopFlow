@@ -14,13 +14,6 @@
     "Stock": 8
   },
   {
-    "Id": "33333333-3333-3333-3333-333333333333",
-    "Name": "MacBook Air M4",
-    "Category": "Laptops",
-    "Price": 129990.00,
-    "Stock": 5
-  },
-  {
     "Id": "55555555-5555-5555-5555-555555555555",
     "Name": "Sony WH-1000XM5",
     "Category": "Headphones",

@@ -4,31 +4,23 @@ using ShopFlow.Api.Application.Interfaces;
 using ShopFlow.Api.Domain.Orders.Models;
 using ShopFlow.Api.Infrastructure.Interfaces;
 
-namespace ShopFlow.Api.Application.Services;
+namespace ShopFlow.Api.Domain.Services;
 
-public class OrderService: IOrderService
+public class OrderService(IOrdersRepository ordersRepository, IProductRepository productRepository)
+    : IOrderService
 {
-    private readonly IOrdersRepository _ordersRepository;
-    private readonly IProductRepository _productRepository;
-    
-    public OrderService(IOrdersRepository ordersRepository, IProductRepository productRepository)
-    {
-        _ordersRepository = ordersRepository;
-        _productRepository = productRepository;
-    }
-    
     public async Task<Result<IReadOnlyList<Order>>> GetAll()
     {
-        var orders = await _ordersRepository.GetAll();
+        var orders = await ordersRepository.GetAll();
         
         return Result<IReadOnlyList<Order>>.Ok(orders);
     }
 
     public async Task<Result<Order>> GetById(Guid id)
     {
-        var order = await _ordersRepository.GetById(id);
+        var order = await ordersRepository.GetById(id);
         
-        if (order == null) return Result<Order>.Fail($"Order with id {id} not found");
+        if (order == null) return Result<Order>.Fail($"OrderRepository with id {id} not found");
         
         return Result<Order>.Ok(order);
     }
@@ -43,7 +35,7 @@ public class OrderService: IOrderService
             .Distinct()
             .ToList();
         
-        var products = await _productRepository.GetByIds(productsIds);
+        var products = await productRepository.GetByIds(productsIds);
         
         var dictionaryProducts = products.ToDictionary(x => x.Id);
 
@@ -72,32 +64,32 @@ public class OrderService: IOrderService
             DateTimeOffset.UtcNow
         );
         
-        var result = await _ordersRepository.Create(order);
+        var result = await ordersRepository.Create(order);
         
         return Result<Order>.Ok(result);
     }
 
     public async Task<Result<Order>> Update(Guid id, UpdateOrderStatusRequest request)
     {
-        var order = await _ordersRepository.GetById(id);
+        var order = await ordersRepository.GetById(id);
         
-        if (order == null) return Result<Order>.Fail($"Order with id {id} not found");
+        if (order == null) return Result<Order>.Fail($"OrderRepository with id {id} not found");
         
         switch (order.Status)
         {
             case OrderStatus.Shipped:
-                return Result<Order>.Fail($"Order with id {id} is shipped");
+                return Result<Order>.Fail($"OrderRepository with id {id} is shipped");
 
             case OrderStatus.Cancelled:
-                return Result<Order>.Fail($"Order with id {id} is cancelled");
+                return Result<Order>.Fail($"OrderRepository with id {id} is cancelled");
 
             case OrderStatus.New when request.OrderStatus == OrderStatus.Shipped:
                 return Result<Order>.Fail(
-                    $"Order with id {id} can have status Processing or Cancelled");
+                    $"OrderRepository with id {id} can have status Processing or Cancelled");
 
             case OrderStatus.Processing when request.OrderStatus == OrderStatus.New:
                 return Result<Order>.Fail(
-                    $"Order with id {id} can`t have status New");
+                    $"OrderRepository with id {id} can`t have status New");
         }
         
         var updatedOrder = order with
@@ -105,7 +97,7 @@ public class OrderService: IOrderService
             Status = request.OrderStatus
         };
         
-        var result = await _ordersRepository.Update(updatedOrder);
+        var result = await ordersRepository.Update(updatedOrder);
         
         return Result<Order>.Ok(result);
     }

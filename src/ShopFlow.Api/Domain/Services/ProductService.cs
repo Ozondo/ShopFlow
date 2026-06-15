@@ -4,27 +4,20 @@ using ShopFlow.Api.Application.Interfaces;
 using ShopFlow.Api.Domain.Products.Models;
 using ShopFlow.Api.Infrastructure.Interfaces;
 
-namespace ShopFlow.Api.Application.Services;
+namespace ShopFlow.Api.Domain.Services;
 
-public class ProductService: IProductSevice
+public class ProductService(IProductRepository productRepository) : IProductSevice
 {
-    private readonly IProductRepository _productRepository;
-    
-    public ProductService(IProductRepository productRepository)
-    {
-        _productRepository = productRepository;
-    }
-    
     public async Task<Result<IReadOnlyList<Product>>> GetAll()
     {
-        var products = await _productRepository.GetAll();
+        var products = await productRepository.GetAll();
         
         return Result<IReadOnlyList<Product>>.Ok(products);
     }
 
     public async Task<Result<Product>> GetById(Guid id)
     {
-        var product = await _productRepository.GetById(id);
+        var product = await productRepository.GetById(id);
         
         if (product is null) return Result<Product>.Fail($"Product not found");
         
@@ -46,7 +39,7 @@ public class ProductService: IProductSevice
             request.Stock
         );
         
-        var result = await _productRepository.Create(product);
+        var result = await productRepository.Create(product);
         
         return Result<Product>.Ok(result);
     }
@@ -54,7 +47,7 @@ public class ProductService: IProductSevice
 
     public async Task<Result<Product>> Update(Guid id, UpdateProductRequest request)
     {
-        var existingProduct = await _productRepository.GetById(id);
+        var existingProduct = await productRepository.GetById(id);
 
         if (existingProduct == null)
             return Result<Product>.Fail($"Product with id {id} not found");
@@ -72,19 +65,19 @@ public class ProductService: IProductSevice
             request.Stock
         );
         
-        var result = await _productRepository.Update(product);
+        var result = await productRepository.Update(product);
         
         return Result<Product>.Ok(product);
     }
 
     public async Task<Result<Product>> Delete(Guid id)
     {
-        var existingProduct = await _productRepository.GetById(id);
+        var existingProduct = await productRepository.GetById(id);
 
         if (existingProduct == null)
             return Result<Product>.Fail($"Product with id {id} not found");
         
-        var result = await _productRepository.Delete(id);
+        var result = await productRepository.Delete(id);
         
         return Result<Product>.Ok(result);
     }

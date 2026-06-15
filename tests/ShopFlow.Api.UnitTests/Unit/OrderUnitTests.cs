@@ -1,8 +1,8 @@
 ﻿using Moq;
 using ShopFlow.Api.Application.DTOs.Orders;
-using ShopFlow.Api.Application.Services;
 using ShopFlow.Api.Domain.Orders.Models;
 using ShopFlow.Api.Domain.Products.Models;
+using ShopFlow.Api.Domain.Services;
 using ShopFlow.Api.Infrastructure.Interfaces;
 
 namespace ShopFlow.Api.Tests.Unit;

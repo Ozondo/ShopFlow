@@ -4,7 +4,7 @@ using ShopFlow.Api.Infrastructure.Interfaces;
 
 namespace ShopFlow.Api.Infrastructure.Repositories;
 
-public class Order(IJsonFileStore jsonFileStore, string ordersPath): IOrdersRepository
+public class OrderRepository(IJsonFileStore jsonFileStore, string ordersPath): IOrdersRepository
 {
     private static readonly SemaphoreSlim Lock = new(1, 1);
     

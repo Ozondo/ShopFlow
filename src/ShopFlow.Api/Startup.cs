@@ -1,3 +1,10 @@
+using ShopFlow.Api.Application.Interfaces;
+using ShopFlow.Api.Domain.Orders.Models;
+using ShopFlow.Api.Domain.Services;
+using ShopFlow.Api.Infrastructure;
+using ShopFlow.Api.Infrastructure.Interfaces;
+using ShopFlow.Api.Infrastructure.Repositories;
+
 namespace ShopFlow.Api;
 
 public class Startup(IConfiguration configuration)
@@ -10,13 +17,29 @@ public class Startup(IConfiguration configuration)
 
         services.AddEndpointsApiExplorer();
         
+        services.AddSwaggerGen();
+        
+        services.AddSingleton<IJsonFileStore, JsonFileStore>();
+        
+        services.AddScoped<IProductRepository>(sp => 
+            new ProductRepository(
+                sp.GetRequiredService<IJsonFileStore>(),
+                "Data/Products/products.json"));
 
-        // TODO: подключи сваггер 
-        // TODO: зарегистрируй Infrastructure-сервисы (JsonFileStore, репозитории)
+        services.AddScoped<IOrdersRepository>(sp =>
+            new OrderRepository(
+                sp.GetRequiredService<IJsonFileStore>(),
+                "Data/Orders/orders.json"));
+
+        services.AddScoped<IProductSevice, ProductService>();
+        
+        services.AddScoped<IOrderService, OrderService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        app.UseSwagger();
+        app.UseSwaggerUI();
         app.UseRouting();
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>

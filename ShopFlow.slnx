@@ -2,5 +2,8 @@
   <Folder Name="/src/">
     <Project Path="src/ShopFlow.Api/ShopFlow.Api.csproj" />
   </Folder>
-  <Folder Name="/test/" />
+  <Folder Name="/test/">
+    <Project Path="tests/ShopFlow.Api.Ingtegration/ShopFlow.Api.IntegrationTests.csproj" />
+    <Project Path="tests/ShopFlow.Api.UnitTests/ShopFlow.Api.UnitTests.csproj" />
+  </Folder>
 </Solution>

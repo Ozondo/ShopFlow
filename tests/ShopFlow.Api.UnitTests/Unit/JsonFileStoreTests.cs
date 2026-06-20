@@ -1,4 +1,4 @@
-﻿using ShopFlow.Api.Infrastructure;
+﻿using ShopFlow.OrderService.Infrastructure.Repositories;
 
 namespace ShopFlow.Api.Tests.Unit;
 

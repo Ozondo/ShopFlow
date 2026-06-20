@@ -1,6 +1,7 @@
-﻿using ShopFlow.Api.Domain.Orders.Models;
-using ShopFlow.Api.Infrastructure;
-using ShopFlow.Api.Infrastructure.Repositories;
+﻿using ShopFlow.Contracts.Order.V1;
+using ShopFlow.OrderService.Domain.Orders.Models;
+using ShopFlow.OrderService.Infrastructure.Repositories;
+using ShopFlow.Api.Domain.Orders.Models;
 
 namespace ShopFlow.Api.Tests.Integration;
 
@@ -24,7 +25,7 @@ public class OrderRepositoryTests : IDisposable
     [Fact]
     public async Task GetAll_ShouldReturnAllOrders()
     {
-        var orders = new List<Order>
+        var orders = new List<OrderDTO>
         {
             CreateOrder(),
             CreateOrder()
@@ -44,7 +45,7 @@ public class OrderRepositoryTests : IDisposable
 
         await _store.WriteAsync(
             _path,
-            new List<Order> { order });
+            new List<OrderDTO> { order });
 
         var result = await _repository.GetById(order.Id);
 
@@ -57,7 +58,7 @@ public class OrderRepositoryTests : IDisposable
     {
         await _store.WriteAsync(
             _path,
-            new List<Order>());
+            new List<OrderDTO>());
 
         var result = await _repository.GetById(Guid.NewGuid());
 
@@ -71,7 +72,7 @@ public class OrderRepositoryTests : IDisposable
 
         await _store.WriteAsync(
             _path,
-            new List<Order>());
+            new List<OrderDTO>());
 
         await _repository.Create(order);
 
@@ -88,7 +89,7 @@ public class OrderRepositoryTests : IDisposable
 
         await _store.WriteAsync(
             _path,
-            new List<Order> { order });
+            new List<OrderDTO> { order });
 
         var updatedOrder = order with
         {
@@ -105,13 +106,13 @@ public class OrderRepositoryTests : IDisposable
             result!.Status);
     }
 
-    private static Order CreateOrder(
+    private static OrderDTO CreateOrder(
         OrderStatus status = OrderStatus.New)
     {
-        return new Order(
+        return new OrderDTO(
             Guid.NewGuid(),
             "Test Customer",
-            new List<OrderItem>(),
+            new List<OrderItemDTO>(),
             status,
             DateTimeOffset.UtcNow);
     }

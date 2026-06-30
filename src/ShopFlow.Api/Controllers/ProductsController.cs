@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using ShopFlow.Api.Application.DTOs.Products;
-using ShopFlow.Api.Application.Interfaces;
+using ShopFlow.Contracts.Product.V1;
 
 namespace ShopFlow.Api.Controllers;
 
@@ -11,55 +10,56 @@ namespace ShopFlow.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class ProductsController : ControllerBase
+public class ProductsController(Product.ProductClient productGrpcService) : ControllerBase
 {
-    private readonly IProductSevice _productSevice;
-
-    public ProductsController(IProductSevice productSevice)
-    {
-        _productSevice = productSevice;
-    }
-
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _productSevice.GetAll();
+        var result = await  productGrpcService.ListProductsAsync(new ListProductsRequest());
+
+        if (result == null) return NotFound("No products were found.");
         
-        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
+        return Ok(result);
     }
     
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var result = await _productSevice.GetById(id);
+        var result = await productGrpcService.GetProductAsync(new GetProductRequest {Id = id.ToString()});
         
-        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
+        if (result == null) return NotFound($"Product with id {id} was not found.");
+        
+        return Ok(result);
     }
     
     [HttpPost]
     [Route("Create")]
     public async Task<IActionResult> Create(CreateProductRequest request)
     {
-        var result = await _productSevice.Create(request);
+        var result =  await productGrpcService.CreateProductAsync(request);
 
-        return result.Success ? 
-            CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result.Data) 
-            : BadRequest(result.Error);
+        if (result == null) return BadRequest();
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
     
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, UpdateProductRequest request)
+    [HttpPut]
+    public async Task<IActionResult> Update(UpdateProductRequest request)
     {
-        var result = await _productSevice.Update(id, request);
+        var result = await productGrpcService.UpdateProductAsync(request);
         
-        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
+        if (result == null) return BadRequest();
+        
+        return Ok(result);
     }
     
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var result = await _productSevice.Delete(id);
+        var result = await productGrpcService.DeleteProductAsync(new  DeleteProductRequest {Id = id.ToString()});
         
-        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
+        if (result == null) return BadRequest();
+        
+        return Ok(result);
     }
 }

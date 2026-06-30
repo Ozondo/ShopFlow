@@ -1,45 +1,65 @@
 using Microsoft.AspNetCore.Mvc;
-using ShopFlow.Api.Application.DTOs.Orders;
-using ShopFlow.Api.Application.Interfaces;
+using ShopFlow.Api.Controllers.Requests;
+using ShopFlow.Contracts.Order.V1;
 
 namespace ShopFlow.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class OrdersController(IOrderService orderService) : ControllerBase
+public class OrdersController(Order.OrderClient orderGrpcService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await orderService.GetAll();
+        var result = await orderGrpcService.GetAllAsync( new GetAllOrderRequest());
         
-        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
+        if (result == null) return NotFound();
+        
+        return Ok(result);
     }
     
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var result = await orderService.GetById(id);
+        var result = await orderGrpcService.GetOrderAsync(new GetOrderRequest{Id = id.ToString()});
         
-        return result.Success ? Ok(result.Data) : NotFound($"{result.Error}");
+        if (result == null) return NotFound();
+        
+        return Ok(result);
     }
     
     [HttpPost]
     [Route("/api/[controller]/[action]")]
-    public async Task<IActionResult> Create(CreateOrderRequest orderRequest)
+    public async Task<IActionResult> Create(CreateOrderRequestController orderRequest)
     {
-        var result = await orderService.Create(orderRequest);
+        var grpcRequest = new CreateOrderRequest
+        {
+            CustomerName = orderRequest.CustomerName
+        };
+
+        grpcRequest.Items.AddRange(
+            orderRequest.Items.Select(x => new CreateItemRequest
+            {
+                ProductId = x.ProductId.ToString(),
+                Quantity = x.Quantity
+            })
+        );
         
-        return result.Success ? 
-            CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result.Data)
-            : BadRequest($"{result.Error}");
+        var result = await orderGrpcService.CreateOrderAsync(grpcRequest);
+        
+        if (result == null) return NotFound();
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
     
-    [HttpPatch("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, UpdateOrderStatusRequest request)
+    [HttpPatch]
+    public async Task<IActionResult> Update(UpdateStatusRequest updateRequest)
     {
-        var result = await orderService.Update(id, request);
-        return result.Success ?  Ok(result.Data) : BadRequest($"{result.Error}");
+        var result = await orderGrpcService.UpdateOrderStatusAsync(updateRequest);
+        
+        if (result == null) return NotFound();
+
+        return Ok(result);
     }
 }

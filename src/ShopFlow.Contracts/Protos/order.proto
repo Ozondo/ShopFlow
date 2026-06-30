@@ -1,0 +1,59 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "ShopFlow.Contracts.Order.V1";
+
+service Order {
+  rpc GetAll (GetAllOrderRequest) returns (GetAllOrderResponse);
+  rpc GetOrder (GetOrderRequest) returns (GetOrderResponse);
+  rpc CreateOrder (CreateOrderRequest) returns (GetOrderResponse);
+  rpc UpdateOrderStatus (UpdateStatusRequest) returns (GetOrderResponse);
+}
+
+message OrderItem {
+  string ProductId = 1;
+  string ProductName = 2;
+  int32 Quantity = 3;
+  string UnitPrice = 4;
+}
+
+message GetOrderRequest {
+  string Id = 1;
+}
+
+message GetOrderResponse {
+  string Id = 1;
+  string CustomersName = 2;
+  repeated OrderItem products = 3;
+  OrderStatusEnum Status = 4;
+  string CreatedAt = 5;
+}
+
+message GetAllOrderRequest {}
+
+message GetAllOrderResponse {
+  repeated GetOrderResponse orders = 1;
+}
+
+message CreateOrderRequest {
+  string CustomerName = 1;
+  repeated CreateItemRequest items = 2;
+}
+
+message CreateItemRequest {
+  string ProductId = 1;
+  int32 Quantity = 2;
+}
+
+message UpdateStatusRequest {
+  string Id = 1;
+  OrderStatusEnum orderStatus = 2;
+}
+
+
+enum OrderStatusEnum
+{
+  ORDER_STATUS_NEW = 0;
+  ORDER_STATUS_PROCESSING = 1;
+  ORDER_STATUS_SHIPPED = 2;
+  ORDER_STATUS_CANCELLED = 3;
+}

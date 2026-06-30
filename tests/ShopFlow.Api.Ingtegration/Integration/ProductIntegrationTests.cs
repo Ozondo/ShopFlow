@@ -1,6 +1,5 @@
-﻿using ShopFlow.Api.Domain.Products.Models;
-using ShopFlow.Api.Infrastructure;
-using ShopFlow.Api.Infrastructure.Repositories;
+﻿using ShopFlow.ProductService.Domain.Products.Models;
+using ShopFlow.ProductService.Infrastructure.Repositories;
 
 namespace ShopFlow.Api.Tests.Integration;
 

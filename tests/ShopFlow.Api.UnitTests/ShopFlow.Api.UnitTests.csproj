@@ -24,8 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ShopFlow.ProductService\ShopFlow.ProductService.csproj" />
     <ProjectReference Include="..\..\src\ShopFlow.Api\ShopFlow.Api.csproj" />
     <ProjectReference Include="..\..\src\ShopFlow.Api\ShopFlow.Api.csproj" />
+    <ProjectReference Include="..\..\src\ShopFlow.OrderService\ShopFlow.OrderService.csproj" />
   </ItemGroup>
 
 </Project>

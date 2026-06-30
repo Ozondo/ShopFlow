@@ -5,13 +5,17 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>ShopFlow.Api</RootNamespace>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="14.1.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.2.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.1" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.62.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,10 +27,18 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Data\orders.json" />
     <_ContentIncludedByDefault Remove="Data\products.json" />
+    <_ContentIncludedByDefault Remove="Data\Products\products.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\DTOs\" />
+    <ProjectReference Include="..\ShopFlow.Contracts\ShopFlow.Contracts.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
+  </ItemGroup>
+
 
 </Project>

@@ -1,13 +1,14 @@
 ﻿using System.Globalization;
 using ShopFlow.Contracts.Order.V1;
 using ShopFlow.OrderService.Domain.Orders.Models;
+using Order = ShopFlow.OrderService.Domain.Orders.Models.Order;
 using OrderItem = ShopFlow.Contracts.Order.V1.OrderItem;
 
 namespace ShopFlow.OrderService.Endpoints;
 
 public static class OrderMapper
 {
-    public static GetOrderResponse? Map(OrderDTO? order)
+    public static GetOrderResponse? Map(Order? order)
     {
         if (order == null) return null;
         
@@ -27,7 +28,7 @@ public static class OrderMapper
         };
     }
     
-    public static List<GetOrderResponse>? Map(IEnumerable<OrderDTO>? orders)
+    public static List<GetOrderResponse>? Map(IEnumerable<Order>? orders)
     {
         if (orders == null) return null;
         

@@ -1,0 +1,48 @@
+services:
+  mongodb:
+    image: mongo:8
+    container_name: shopflow-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    volumes:
+      - mongodb_data:/data/db
+  
+  productservice:
+    container_name: shopflow-productservice
+    build:
+      context: .
+      dockerfile: src/ShopFlow.ProductService/Dockerfile
+    depends_on:
+      - mongodb
+    ports:
+      - "5249:8080"
+  
+  orderservice:
+    container_name: shopflow-orderservice
+    build:
+      context: .
+      dockerfile: src/ShopFlow.OrderService/Dockerfile
+    depends_on:
+      - mongodb
+      - productservice
+    ports:
+      - "5128:8080"
+  
+  apigateway:
+    container_name: shopflow-apigateway
+    build:
+      context: .
+      dockerfile: src/ShopFlow.Api/Dockerfile
+    depends_on:
+      - mongodb
+      - orderservice
+      - productservice
+    ports:
+      - "5250:8080"
+
+volumes:
+  mongodb_data:

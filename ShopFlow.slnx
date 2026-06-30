@@ -1,9 +1,13 @@
 <Solution>
+  <Folder Name="/Docker/">
+    <File Path="docker-compose.yml" />
+  </Folder>
   <Folder Name="/src/">
-    <Project Path="ShopFlow.Contracts/ShopFlow.Contracts.csproj" />
-    <Project Path="ShopFlow.ProductService/ShopFlow.ProductService.csproj" />
     <Project Path="src/ShopFlow.Api/ShopFlow.Api.csproj" />
+    <Project Path="src/ShopFlow.Common/ShopFlow.Common.csproj" />
+    <Project Path="src/ShopFlow.Contracts/ShopFlow.Contracts.csproj" />
     <Project Path="src/ShopFlow.OrderService/ShopFlow.OrderService.csproj" />
+    <Project Path="src/ShopFlow.ProductService/ShopFlow.ProductService.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="tests/ShopFlow.Api.Ingtegration/ShopFlow.Api.IntegrationTests.csproj" />

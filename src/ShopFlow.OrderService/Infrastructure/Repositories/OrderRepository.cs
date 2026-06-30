@@ -1,69 +1,41 @@
-﻿using ShopFlow.Api.Infrastructure.Interfaces;
+﻿using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using ShopFlow.Common;
+using ShopFlow.Contracts.Product.V1;
 using ShopFlow.OrderService.Domain.Orders.Models;
 using ShopFlow.OrderService.Infrastructure.Interfaces;
 
 namespace ShopFlow.OrderService.Infrastructure.Repositories;
 
-public class OrderRepository(IJsonFileStore jsonFileStore, string ordersPath): IOrdersRepository
+public class OrderRepository: IOrdersRepository
 {
-    private static readonly SemaphoreSlim Lock = new(1, 1);
-    
-    public async Task<List<OrderDTO>> GetAll()
+    private readonly IMongoCollection<Order> _orders;
+
+    public OrderRepository(IMongoClient mongoClient, IOptions<MongoDbSettings> settings)
     {
-        var result = await jsonFileStore.ReadAsync<OrderDTO>(ordersPath);
-        
-        return result;
-    }
-
-    public async Task<OrderDTO?> GetById(Guid id)
-    {
-        var orders = await jsonFileStore.ReadAsync<OrderDTO>(ordersPath);
-        
-        return orders.FirstOrDefault(x => x.Id == id);
-    }
-
-    public async Task<OrderDTO> Create(OrderDTO orderDto)
-    {
-        await Lock.WaitAsync();
-
-        try
-        {
-            var orders = await jsonFileStore.ReadAsync<OrderDTO>(ordersPath);
-        
-            orders.Add(orderDto);
-        
-            await jsonFileStore.WriteAsync(ordersPath, orders);
-        
-            return orderDto;
-        }
-        
-        finally
-        {
-            Lock.Release();
-        }
-
+        var database = mongoClient.GetDatabase(settings.Value.DatabaseName);
+        _orders = database.GetCollection<Order>("Orders");
     }
     
-    public async Task<OrderDTO> Update(OrderDTO orderDto)
+    public async Task<List<Order>> GetAll()
     {
-        await Lock.WaitAsync();
+        return await _orders.Find(_ => true).ToListAsync();
+    }
 
-        try
-        {
-            var orders = await jsonFileStore.ReadAsync<OrderDTO>(ordersPath);
+    public async Task<Order?> GetById(Guid id)
+    {
+        return await _orders.Find(x => x.Id == id).FirstOrDefaultAsync();
+    }
 
-            var orderIndex = orders.FindIndex(x => x.Id == orderDto.Id);
-
-            orders[orderIndex] = orderDto;
-
-            await jsonFileStore.WriteAsync(ordersPath, orders);
-
-            return orderDto;
-        }
-        
-        finally
-        {
-            Lock.Release();
-        }
+    public async Task<Order> Create(Order order)
+    {
+        await _orders.InsertOneAsync(order);
+        return order;
+    }
+    
+    public async Task<Order> Update(Order order)
+    {
+        await _orders.ReplaceOneAsync(x => x.Id == order.Id, order);
+        return order;
     }
 }

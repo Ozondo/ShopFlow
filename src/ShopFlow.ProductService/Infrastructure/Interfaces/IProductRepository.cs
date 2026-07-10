@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ShopFlow.ProductService.Domain.Products.Models;
+﻿using ShopFlow.ProductService.Domain.Products.Models;
 
 namespace ShopFlow.ProductService.Infrastructure.Interfaces;
 

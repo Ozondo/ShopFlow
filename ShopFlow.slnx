@@ -10,7 +10,7 @@
     <Project Path="src/ShopFlow.ProductService/ShopFlow.ProductService.csproj" />
   </Folder>
   <Folder Name="/test/">
-    <Project Path="tests/ShopFlow.Api.Ingtegration/ShopFlow.Api.IntegrationTests.csproj" />
-    <Project Path="tests/ShopFlow.Api.UnitTests/ShopFlow.Api.UnitTests.csproj" />
+    <Project Path="ShopFlow.ProductService.IntegrationTests/ShopFlow.ProductService.IntegrationTests.csproj" />
+    <Project Path="ShopFlow.ProductService.UnitTests/ShopFlow.ProductService.UnitTests.csproj" />
   </Folder>
 </Solution>

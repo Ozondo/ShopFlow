@@ -31,3 +31,5 @@ var app = builder.Build();
 
 app.MapGrpcService<ProductGrpcService>();
 app.Run();
+
+public partial class Program;

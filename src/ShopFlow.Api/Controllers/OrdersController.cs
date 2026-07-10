@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ShopFlow.Api.Controllers.Requests;
 using ShopFlow.Contracts.Order.V1;
+using CreateOrderRequest = ShopFlow.Api.Controllers.Requests.CreateOrderRequest;
 
 namespace ShopFlow.Api.Controllers;
 
@@ -31,9 +32,9 @@ public class OrdersController(Order.OrderClient orderGrpcService) : ControllerBa
     
     [HttpPost]
     [Route("/api/[controller]/[action]")]
-    public async Task<IActionResult> Create(CreateOrderRequestController orderRequest)
+    public async Task<IActionResult> Create(CreateOrderRequest orderRequest)
     {
-        var grpcRequest = new CreateOrderRequest
+        var grpcRequest = new Contracts.Order.V1.CreateOrderRequest
         {
             CustomerName = orderRequest.CustomerName
         };

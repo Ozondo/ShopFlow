@@ -2,6 +2,6 @@
 
 namespace ShopFlow.Api.Controllers.Requests;
 
-public sealed record CreateOrderRequestController(
+public sealed record CreateOrderRequest(
     [Required] string CustomerName,
     [Required] IReadOnlyList<CreateOrderItemRequest> Items);

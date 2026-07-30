@@ -1,0 +1,59 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "ShopFlow.Contracts.Product.V1";
+
+package catalog.v1;
+
+service Product {
+  rpc GetProduct (GetProductRequest) returns (ProductResponse);
+  rpc ListProducts (ListProductsRequest) returns (ListProductsResponse);
+  rpc CreateProduct (CreateProductRequest) returns (ProductResponse);
+  rpc UpdateProduct (UpdateProductRequest) returns (ProductResponse);
+  rpc DeleteProduct (DeleteProductRequest) returns (ProductResponse);
+  rpc GetByIds (GetByIdsRequest) returns (GetByIdsResponse);
+}
+
+message GetProductRequest {
+  string id = 1;
+}
+
+message ProductResponse {
+  string id = 1;
+  string Name = 2;
+  string Category = 3;
+  string Price = 4;
+  int32 Stock = 5;
+}
+
+message ListProductsRequest {}
+
+message ListProductsResponse {
+  repeated ProductResponse products = 1;
+}
+
+message CreateProductRequest {
+    string Name = 1;
+    string Category = 2;
+    string Price = 3;
+    int32 Stock = 4;
+}
+
+message UpdateProductRequest {
+  string id = 1;
+  string Name = 2;
+  string Category = 3;
+  string Price = 4;
+  int32 Stock = 5;
+}
+
+message DeleteProductRequest {
+  string id = 1;
+}
+
+message GetByIdsRequest {
+  repeated string ids = 1;
+}
+
+message GetByIdsResponse {
+  repeated ProductResponse products = 1;
+}

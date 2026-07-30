@@ -1,9 +1,5 @@
-using ShopFlow.Api.Application.Interfaces;
-using ShopFlow.Api.Domain.Orders.Models;
-using ShopFlow.Api.Domain.Services;
-using ShopFlow.Api.Infrastructure;
-using ShopFlow.Api.Infrastructure.Interfaces;
-using ShopFlow.Api.Infrastructure.Repositories;
+using ShopFlow.Contracts.Product.V1;
+using ShopFlow.Contracts.Order.V1;
 
 namespace ShopFlow.Api;
 
@@ -19,21 +15,15 @@ public class Startup(IConfiguration configuration)
         
         services.AddSwaggerGen();
         
-        services.AddSingleton<IJsonFileStore, JsonFileStore>();
+        services.AddGrpcClient<Order.OrderClient>(options =>
+        {
+            options.Address = new Uri(Configuration["OrderService:Url"]!);
+        });
         
-        services.AddScoped<IProductRepository>(sp => 
-            new ProductRepository(
-                sp.GetRequiredService<IJsonFileStore>(),
-                "Data/Products/products.json"));
-
-        services.AddScoped<IOrdersRepository>(sp =>
-            new OrderRepository(
-                sp.GetRequiredService<IJsonFileStore>(),
-                "Data/Orders/orders.json"));
-
-        services.AddScoped<IProductSevice, ProductService>();
-        
-        services.AddScoped<IOrderService, OrderService>();
+        services.AddGrpcClient<Product.ProductClient>(options =>
+        {
+            options.Address = new Uri(Configuration["ProductService:Url"]!);
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

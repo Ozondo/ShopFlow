@@ -49,7 +49,6 @@ message UpdateStatusRequest {
   OrderStatusEnum orderStatus = 2;
 }
 
-
 enum OrderStatusEnum
 {
   ORDER_STATUS_NEW = 0;

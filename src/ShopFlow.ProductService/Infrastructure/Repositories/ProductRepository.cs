@@ -26,10 +26,10 @@ public class ProductRepository: IProductRepository
         return await _products.Find(x => x.Id == id).FirstOrDefaultAsync();
     }
     
-    public async Task<List<Product>> GetByIds(IEnumerable<Guid> ids)
+    public Task<List<Product>> GetByIds(IEnumerable<Guid> ids)
     {
         var idsList = ids.ToHashSet();
-        return await _products.Find(x => idsList.Contains(x.Id)).ToListAsync();
+        return _products.Find(x => idsList.Contains(x.Id)).ToListAsync();
     }
     
     public async Task<Product> Create(Product product)

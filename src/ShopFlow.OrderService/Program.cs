@@ -1,10 +1,12 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using ShopFlow.Common;
+using ShopFlow.Common.Redis;
 using ShopFlow.Contracts.Product.V1;
 using ShopFlow.OrderService.Endpoints;
 using ShopFlow.OrderService.Infrastructure.Interfaces;
 using ShopFlow.OrderService.Infrastructure.Repositories;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,16 @@ builder.Services.AddSingleton<IMongoClient>(serviceProvider =>
 
     return new MongoClient(settings.ConnectionString);
 });
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var connectionString =
+        builder.Configuration["Redis:ConnectionString"];
+
+    return ConnectionMultiplexer.Connect(connectionString!);
+});
+
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
 builder.Services.AddGrpcClient<Product.ProductClient>(options =>
 {

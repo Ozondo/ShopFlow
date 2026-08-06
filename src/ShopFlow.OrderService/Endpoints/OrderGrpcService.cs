@@ -6,7 +6,7 @@ using ShopFlow.OrderService.Usecase.GetAll;
 using ShopFlow.OrderService.Usecase.GetOrder;
 using ShopFlow.OrderService.Usecase.UpdateOrder;
 using Order = ShopFlow.OrderService.Domain.Orders.Models.Order;
-using OrderStatus = ShopFlow.Api.Domain.Orders.Models.OrderStatus;
+using OrderStatus = ShopFlow.OrderService.Domain.Orders.Models.OrderStatus;
 using OrderGRPC = ShopFlow.Contracts.Order.V1.Order;
 
 namespace ShopFlow.OrderService.Endpoints;

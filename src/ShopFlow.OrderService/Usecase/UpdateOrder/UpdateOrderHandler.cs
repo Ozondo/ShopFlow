@@ -1,11 +1,11 @@
 ﻿using MediatR;
-using ShopFlow.Api.Domain.Orders.Models;
+using ShopFlow.Common.Redis;
 using ShopFlow.OrderService.Domain.Orders.Models;
 using ShopFlow.OrderService.Infrastructure.Interfaces;
 
 namespace ShopFlow.OrderService.Usecase.UpdateOrder;
 
-public class UpdateOrderHandler(IOrdersRepository ordersRepository) : IRequestHandler<UpdateOrderCommand, Order?>
+public class UpdateOrderHandler(IOrdersRepository ordersRepository, ICacheService cacheService) : IRequestHandler<UpdateOrderCommand, Order?>
 {
     public async Task<Order?> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
     {
@@ -15,6 +15,11 @@ public class UpdateOrderHandler(IOrdersRepository ordersRepository) : IRequestHa
         
         var newOrder = new Order(request.Id, order.CustomerName, order.Items, (OrderStatus)request.Status, order.CreatedAt);
         
-        return await ordersRepository.Update(newOrder);
+        var result =  await ordersRepository.Update(newOrder);
+        
+        var cacheKey = $"order:{request.Id}";
+        await cacheService.RemoveAsync(cacheKey);
+        
+        return result;
     }
 }

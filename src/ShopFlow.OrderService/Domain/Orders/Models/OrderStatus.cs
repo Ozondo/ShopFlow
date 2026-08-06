@@ -1,4 +1,4 @@
-namespace ShopFlow.Api.Domain.Orders.Models;
+namespace ShopFlow.OrderService.Domain.Orders.Models;
 
 public enum OrderStatus
 {

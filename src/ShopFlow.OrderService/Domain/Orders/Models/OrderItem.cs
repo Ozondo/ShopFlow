@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ShopFlow.Api.Domain.Orders.Models;
+namespace ShopFlow.OrderService.Domain.Orders.Models;
 
 public sealed record OrderItem(
     [property: BsonId]

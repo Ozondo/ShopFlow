@@ -1,6 +1,5 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using ShopFlow.Api.Domain.Orders.Models;
 
 namespace ShopFlow.OrderService.Domain.Orders.Models;
 

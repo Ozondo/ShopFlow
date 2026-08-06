@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using MediatR;
-using ShopFlow.Api.Domain.Orders.Models;
 using ShopFlow.Contracts.Product.V1;
 using ShopFlow.OrderService.Domain.Orders.Models;
 using ShopFlow.OrderService.Infrastructure.Interfaces;

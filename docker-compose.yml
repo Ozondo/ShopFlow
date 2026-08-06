@@ -11,6 +11,13 @@ services:
     volumes:
       - mongodb_data:/data/db
   
+  redis:
+    image: redis:7-alpine
+    container_name: shopflow-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+  
   productservice:
     container_name: shopflow-productservice
     build:
@@ -18,6 +25,7 @@ services:
       dockerfile: src/ShopFlow.ProductService/Dockerfile
     depends_on:
       - mongodb
+      - redis
     ports:
       - "5249:8080"
   
@@ -29,6 +37,7 @@ services:
     depends_on:
       - mongodb
       - productservice
+      - redis
     ports:
       - "5128:8080"
   
